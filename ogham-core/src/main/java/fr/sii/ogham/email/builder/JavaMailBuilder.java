@@ -4,8 +4,14 @@ import java.util.Properties;
 
 import javax.mail.Authenticator;
 
-import fr.sii.ogham.core.builder.Builder;
+import fr.sii.ogham.core.builder.ImplementationBuilder;
+import fr.sii.ogham.core.builder.annotation.RequiredClasses;
+import fr.sii.ogham.core.builder.annotation.RequiredProperties;
+import fr.sii.ogham.core.builder.annotation.RequiredProperty;
 import fr.sii.ogham.core.charset.FixedCharsetProvider;
+import fr.sii.ogham.core.condition.Condition;
+import fr.sii.ogham.core.condition.FixedCondition;
+import fr.sii.ogham.core.message.Message;
 import fr.sii.ogham.core.message.content.Content;
 import fr.sii.ogham.core.message.content.MultiContent;
 import fr.sii.ogham.core.message.content.StringContent;
@@ -38,7 +44,9 @@ import fr.sii.ogham.email.sender.impl.javamail.StringContentHandler;
  * @author Aurélien Baudet
  *
  */
-public class JavaMailBuilder implements Builder<JavaMailSender> {
+@RequiredProperties(props={@RequiredProperty(value="mail.host", alternatives="mail.smtp.host")})
+@RequiredClasses({"javax.mail.Transport", "com.sun.mail.smtp.SMTPTransport"})
+public class JavaMailBuilder implements ImplementationBuilder<JavaMailSender> {
 	/**
 	 * The properties to use
 	 */
@@ -224,6 +232,11 @@ public class JavaMailBuilder implements Builder<JavaMailSender> {
 	public JavaMailBuilder setAuthenticator(Authenticator authenticator) {
 		this.authenticator = authenticator;
 		return this;
+	}
+	
+	@Override
+	public Condition<Message> getRuntimeCondition() {
+		return new FixedCondition<>(true);
 	}
 
 	@Override
